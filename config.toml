@@ -1,0 +1,17 @@
+# Production config: changing anything here changes the model version hash.
+[model]
+name = "gbm_lags"            # "gbm_lags" or "seasonal_naive"
+season_length = 12
+lags = [1, 2, 3, 6, 12]
+rolling_windows = [3, 12]
+n_estimators = 300
+learning_rate = 0.05
+max_depth = 3
+random_state = 42
+
+[backtest]
+folds = 3
+horizon = 12
+
+[serving]
+max_horizon = 24

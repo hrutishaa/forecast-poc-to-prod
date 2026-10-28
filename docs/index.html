@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forecast: PoC → Production · Live demo</title>
+<meta name="description" content="Seasonal-naive baseline vs gradient boosting with lag features, with honest backtests. A forecasting model taken from notebook to production.">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head><body>
+<header>
+  <div><h1>Forecast: PoC → Production</h1><p class="sub">Baseline vs ML forecaster with backtests, versioned config, and a FastAPI service behind it. This page shows the precomputed results from that pipeline.</p></div>
+  <a class="gh" href="https://github.com/hrutishaa/forecast-poc-to-prod">View code on GitHub</a>
+</header>
+<section class="controls">
+  <label>Series<select id="series"></select></label>
+  <label>Horizon: <b id="hval">12</b> months<input id="h" type="range" min="1" max="24" value="12"></label>
+  <div><div class="hint" style="margin-bottom:4px">View</div><div class="seg"><button data-v="backtest" class="on">Backtest vs actuals</button><button data-v="future">Future forecast</button></div></div>
+</section>
+<p id="desc" class="desc"></p>
+<section id="kpis" class="kpis"></section>
+<section class="card"><h3 id="chartTitle"></h3><canvas id="chart" height="110"></canvas></section>
+<section class="grid">
+  <div class="card"><h3>Holdout metrics (first <span class="hh"></span> months after cutoff)</h3><table id="m1"></table></div>
+  <div class="card"><h3>Rolling-origin backtest (3 folds × 12 months, from CI)</h3><table id="m2"></table></div>
+</section>
+<section class="card"><h3>Call the production API</h3><pre id="curl" style="white-space:pre-wrap;margin:0"></pre></section>
+<footer>Model version <code id="ver"></code>. Data is synthetic and seeded for reproducibility. MIT © 2026 Hrutishaa Nanduti</footer>
+<script src="app.js"></script>
+</body></html>
