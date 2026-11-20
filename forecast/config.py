@@ -32,6 +32,8 @@ class Config:
     folds: int = 3
     horizon: int = 12
     max_horizon: int = 24
+    interval_level: float = 0.8
+    interval_origins: int = 12
 
 
 def load_config(path: str | Path = ROOT / "config.toml") -> Config:
@@ -41,6 +43,7 @@ def load_config(path: str | Path = ROOT / "config.toml") -> Config:
     for k in ("lags", "rolling_windows"):
         if k in m:
             m[k] = tuple(m[k])
-    bt, sv = raw.get("backtest", {}), raw.get("serving", {})
+    bt, sv, iv = raw.get("backtest", {}), raw.get("serving", {}), raw.get("intervals", {})
     return Config(model=ModelConfig(**m), folds=bt.get("folds", 3), horizon=bt.get("horizon", 12),
-                  max_horizon=sv.get("max_horizon", 24))
+                  max_horizon=sv.get("max_horizon", 24), interval_level=iv.get("level", 0.8),
+                  interval_origins=iv.get("n_origins", 12))

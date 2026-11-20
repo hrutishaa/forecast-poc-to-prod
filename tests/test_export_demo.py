@@ -13,3 +13,8 @@ def test_export_demo_payload(tmp_path):
     assert len(s["holdout"]["gbm_lags"]) == p["max_horizon"] == len(s["future_dates"])
     assert s["cutoff_index"] == len(s["values"]) - p["max_horizon"] - 1
     assert (tmp_path / "data.json").stat().st_size > 1000
+    assert p["interval_level"] == 0.8
+    for key in ("holdout_band", "future_band"):
+        b = s[key]["gbm_lags"]
+        assert len(b["lower"]) == len(b["upper"]) == p["max_horizon"]
+        assert all(lo <= hi for lo, hi in zip(b["lower"], b["upper"]))

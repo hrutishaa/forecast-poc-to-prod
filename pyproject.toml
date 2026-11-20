@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "forecast-poc-to-prod"
-version = "0.1.0"
+version = "0.2.0"
 description = "Taking a forecasting model from notebook PoC to a tested, versioned, served API"
 readme = "README.md"
 license = { text = "MIT" }

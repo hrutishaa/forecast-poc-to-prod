@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT))
 from forecast.backtest import backtest  # noqa: E402
 from forecast.config import load_config  # noqa: E402
 from forecast.data import SERIES, load_series  # noqa: E402
+from forecast.intervals import calibrate  # noqa: E402
 from forecast.models import build_model  # noqa: E402
 
 
@@ -26,16 +27,24 @@ def main(out: Path = ROOT / "docs" / "data.json") -> dict:
     cfg = load_config()
     H = cfg.max_horizon
     models = {"seasonal_naive": replace(cfg.model, name="seasonal_naive"), "gbm_lags": cfg.model}
-    payload = {"max_horizon": H, "model_version": f"{cfg.model.name}-{cfg.model.version_hash()}", "series": {}}
+    payload = {"max_horizon": H, "interval_level": cfg.interval_level, "model_version": f"{cfg.model.name}-{cfg.model.version_hash()}", "series": {}}
     for name, desc in SERIES.items():
         y = load_series(name)
         train = y.iloc[:-H]
         entry = {"description": desc, "dates": [str(d.date()) for d in y.index], "values": r(y.values),
-                 "cutoff_index": len(train) - 1, "holdout": {}, "future": {}, "future_dates": None, "rolling_backtest": {}}
+                 "cutoff_index": len(train) - 1, "holdout": {}, "future": {}, "future_dates": None, "rolling_backtest": {},
+                 "holdout_band": {}, "future_band": {}}
         for key, mc in models.items():
-            entry["holdout"][key] = r(build_model(mc).fit(train).predict(H).values)
-            fut = build_model(mc).fit(y).predict(H)
+            make = lambda mc=mc: build_model(mc)  # noqa: E731
+            hold = make().fit(train).predict(H)
+            entry["holdout"][key] = r(hold.values)
+            # Holdout band is calibrated on the training window only, so its coverage is an honest test.
+            hb = calibrate(train, make, H, cfg.interval_level, cfg.interval_origins).apply(hold)
+            entry["holdout_band"][key] = {"lower": r(hb.lower), "upper": r(hb.upper)}
+            fut = make().fit(y).predict(H)
             entry["future"][key] = r(fut.values)
+            fb = calibrate(y, make, H, cfg.interval_level, cfg.interval_origins).apply(fut)
+            entry["future_band"][key] = {"lower": r(fb.lower), "upper": r(fb.upper)}
             entry["future_dates"] = [str(d.date()) for d in fut.index]
             bt = backtest(y, lambda mc=mc: build_model(mc), cfg.horizon, cfg.folds)
             entry["rolling_backtest"][key] = {"mape": round(bt["mape"], 2), "rmse": round(bt["rmse"], 2)}

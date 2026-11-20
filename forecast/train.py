@@ -8,6 +8,7 @@ from dataclasses import replace
 from . import registry
 from .backtest import backtest
 from .config import load_config
+from .intervals import calibrate
 from .data import SERIES, load_series
 from .models import build_model
 
@@ -21,8 +22,9 @@ def train(series: str, cfg=None, root=registry.ARTIFACTS) -> dict:
                "beats_baseline": model_bt["mape"] < base_bt["mape"]}
     model = build_model(cfg.model).fit(y)
     version = f"{cfg.model.name}-{cfg.model.version_hash()}"
-    registry.save(model, series, version, metrics, root)
-    return {"series": series, "version": version, **metrics}
+    calib = calibrate(y, lambda: build_model(cfg.model), cfg.max_horizon, cfg.interval_level, cfg.interval_origins)
+    registry.save(model, series, version, metrics, root, intervals=calib.to_dict())
+    return {"series": series, "version": version, **metrics, "intervals": calib.to_dict()}
 
 
 def main(argv=None):

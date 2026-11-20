@@ -14,13 +14,15 @@ from .config import ROOT
 ARTIFACTS = ROOT / "artifacts"
 
 
-def save(model, series: str, version: str, metrics: dict, root: Path = ARTIFACTS) -> Path:
+def save(model, series: str, version: str, metrics: dict, root: Path = ARTIFACTS, intervals: dict | None = None) -> Path:
     d = root / series / version
     d.mkdir(parents=True, exist_ok=True)
     with open(d / "model.pkl", "wb") as fh:
         pickle.dump(model, fh)
     meta = {"series": series, "version": version, "metrics": metrics,
             "trained_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+    if intervals is not None:
+        meta["intervals"] = intervals
     (d / "meta.json").write_text(json.dumps(meta, indent=2))
     (root / series / "LATEST").write_text(version)
     return d

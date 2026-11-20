@@ -22,6 +22,14 @@ def test_forecast_happy_path():
     assert body["forecast"][0]["date"] == "2026-01-01"
 
 
+def test_forecast_returns_prediction_interval():
+    body = client.post("/forecast", json={"series": "ecommerce_orders", "horizon": 24}).json()
+    assert body["interval_level"] == 0.8
+    pts = body["forecast"]
+    assert all(p["lower"] <= p["value"] <= p["upper"] for p in pts)
+    assert pts[-1]["upper"] - pts[-1]["lower"] >= pts[0]["upper"] - pts[0]["lower"]
+
+
 def test_forecast_validates_horizon_and_series():
     assert client.post("/forecast", json={"series": "retail_sales", "horizon": 0}).status_code == 422
     assert client.post("/forecast", json={"series": "retail_sales", "horizon": 999}).status_code == 422

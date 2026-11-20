@@ -9,3 +9,4 @@ def test_train_saves_versioned_artifact_and_reloads(tmp_path):
     model, meta = registry.load_latest("energy_demand", root=tmp_path)
     assert meta["version"] == r["version"] and "baseline" in meta["metrics"]
     assert len(model.predict(3)) == 3
+    assert meta["intervals"]["level"] == 0.8 and len(meta["intervals"]["rel_q"]) == 24

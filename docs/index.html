@@ -17,7 +17,8 @@
 </section>
 <p id="desc" class="desc"></p>
 <section id="kpis" class="kpis"></section>
-<section class="card"><h3 id="chartTitle"></h3><canvas id="chart" height="110"></canvas></section>
+<section class="card"><h3 id="chartTitle"></h3><canvas id="chart" height="110"></canvas>
+  <p class="hint" style="margin:8px 0 0">Shaded band = 80% prediction interval (split conformal: built from the model's real past errors at each step ahead, using only data before the cutoff). Coverage shows how many actuals landed inside it.</p></section>
 <section class="grid">
   <div class="card"><h3>Holdout metrics (first <span class="hh"></span> months after cutoff)</h3><table id="m1"></table></div>
   <div class="card"><h3>Rolling-origin backtest (3 folds × 12 months, from CI)</h3><table id="m2"></table></div>
