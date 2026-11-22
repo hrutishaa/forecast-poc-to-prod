@@ -11,8 +11,13 @@
 - [x] Split conformal 80% intervals per step ahead, stored in the registry, returned by `/forecast`
 - [x] Interval band + honest holdout coverage in the live demo
 
+## v0.3: Exponential smoothing + automatic model selection ✅
+- [x] SES, Holt and additive Holt-Winters implemented from scratch (no statsmodels dependency)
+- [x] Automatic per-series selection by rolling-backtest MAPE/sMAPE/RMSE, leaderboard in registry + `GET /models/{series}`
+- [x] Live demo shows all candidates, the auto-selected model and its interval band
+
 ## Next
-- [ ] Add ETS / Holt-Winters (statsmodels) as a third candidate, with automatic model selection per series
+- [ ] Multiplicative Holt-Winters and damped trend as extra candidates (e-commerce has multiplicative seasonality)
 - [ ] Real public dataset (e.g. US Census retail sales) behind the same `load_series` interface
 - [ ] Data validation on load (missing months, outliers) with clear errors
 - [ ] Drift monitoring: compare live errors with backtest errors and alert when they diverge

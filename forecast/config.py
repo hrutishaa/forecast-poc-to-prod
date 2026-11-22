@@ -34,6 +34,8 @@ class Config:
     max_horizon: int = 24
     interval_level: float = 0.8
     interval_origins: int = 12
+    candidates: tuple[str, ...] = ("seasonal_naive", "gbm_lags", "ets_simple", "ets_holt", "ets_hw_add")
+    selection_metric: str = "mape"
 
 
 def load_config(path: str | Path = ROOT / "config.toml") -> Config:
@@ -44,6 +46,9 @@ def load_config(path: str | Path = ROOT / "config.toml") -> Config:
         if k in m:
             m[k] = tuple(m[k])
     bt, sv, iv = raw.get("backtest", {}), raw.get("serving", {}), raw.get("intervals", {})
+    sel = raw.get("selection", {})
     return Config(model=ModelConfig(**m), folds=bt.get("folds", 3), horizon=bt.get("horizon", 12),
                   max_horizon=sv.get("max_horizon", 24), interval_level=iv.get("level", 0.8),
-                  interval_origins=iv.get("n_origins", 12))
+                  interval_origins=iv.get("n_origins", 12),
+                  candidates=tuple(sel.get("candidates", Config.candidates)),
+                  selection_metric=sel.get("metric", "mape"))

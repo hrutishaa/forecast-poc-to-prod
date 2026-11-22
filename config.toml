@@ -1,6 +1,7 @@
 # Production config: changing anything here changes the model version hash.
 [model]
-name = "gbm_lags"            # "gbm_lags" or "seasonal_naive"
+name = "auto"                # "auto" (backtest-based selection per series) or one model:
+                             # "seasonal_naive", "gbm_lags", "ets_simple", "ets_holt", "ets_hw_add"
 season_length = 12
 lags = [1, 2, 3, 6, 12]
 rolling_windows = [3, 12]
@@ -19,3 +20,8 @@ max_horizon = 24
 [intervals]
 level = 0.8                  # 80% prediction interval (split conformal)
 n_origins = 12               # past cut-offs used to measure real forecast errors
+
+[selection]
+# Used when [model] name = "auto": every candidate gets the same rolling backtest, lowest error ships.
+candidates = ["seasonal_naive", "gbm_lags", "ets_simple", "ets_holt", "ets_hw_add"]
+metric = "mape"              # "mape", "smape" or "rmse"

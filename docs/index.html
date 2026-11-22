@@ -2,12 +2,12 @@
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Forecast: PoC → Production · Live demo</title>
-<meta name="description" content="Seasonal-naive baseline vs gradient boosting with lag features, with honest backtests. A forecasting model taken from notebook to production.">
+<meta name="description" content="Seasonal-naive baseline vs gradient boosting vs Holt-Winters / ETS, with automatic model selection by backtest error and honest prediction intervals. A forecasting model taken from notebook to production.">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head><body>
 <header>
-  <div><h1>Forecast: PoC → Production</h1><p class="sub">Baseline vs ML forecaster with backtests, versioned config, and a FastAPI service behind it. This page shows the precomputed results from that pipeline.</p></div>
+  <div><h1>Forecast: PoC → Production</h1><p class="sub">Five candidate models (seasonal-naive baseline, gradient boosting, and three exponential-smoothing / Holt-Winters models) get the same rolling backtest, and the lowest-error one is picked automatically for each series. Versioned config and a FastAPI service sit behind it. This page shows the precomputed results from that pipeline.</p></div>
   <a class="gh" href="https://github.com/hrutishaa/forecast-poc-to-prod">View code on GitHub</a>
 </header>
 <section class="controls">
@@ -18,12 +18,12 @@
 <p id="desc" class="desc"></p>
 <section id="kpis" class="kpis"></section>
 <section class="card"><h3 id="chartTitle"></h3><canvas id="chart" height="110"></canvas>
-  <p class="hint" style="margin:8px 0 0">Shaded band = 80% prediction interval (split conformal: built from the model's real past errors at each step ahead, using only data before the cutoff). Coverage shows how many actuals landed inside it.</p></section>
+  <p class="hint" style="margin:8px 0 0">★ = the model auto-selected by lowest rolling-backtest MAPE (in the backtest view, selection uses only data before the cutoff). Shaded band = its 80% prediction interval (split conformal: built from the model's real past errors at each step ahead). Coverage shows how many actuals landed inside it. Click legend items to show the other candidates.</p></section>
 <section class="grid">
   <div class="card"><h3>Holdout metrics (first <span class="hh"></span> months after cutoff)</h3><table id="m1"></table></div>
-  <div class="card"><h3>Rolling-origin backtest (3 folds × 12 months, from CI)</h3><table id="m2"></table></div>
+  <div class="card"><h3>Model selection leaderboard: rolling-origin backtest (3 folds × 12 months, full history)</h3><table id="m2"></table></div>
 </section>
 <section class="card"><h3>Call the production API</h3><pre id="curl" style="white-space:pre-wrap;margin:0"></pre></section>
-<footer>Model version <code id="ver"></code>. Data is synthetic and seeded for reproducibility. MIT © 2026 Hrutishaa Nanduti</footer>
+<footer>Production model version for this series: <code id="ver"></code>. Data is synthetic and seeded for reproducibility. MIT © 2026 Hrutishaa Nanduti</footer>
 <script src="app.js"></script>
 </body></html>

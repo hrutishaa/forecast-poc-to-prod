@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.ensemble import GradientBoostingRegressor
 
 from .config import ModelConfig
+from .ets import ETSForecaster
 from .features import make_features
 
 
@@ -69,9 +70,17 @@ class GBMForecaster:
         return pd.Series(out, index=idx[-horizon:])
 
 
+ETS_MODELS = {"ets_simple": "simple", "ets_holt": "holt", "ets_hw_add": "holt_winters_add"}
+CANDIDATES = ("seasonal_naive", "gbm_lags", *ETS_MODELS)
+
+
 def build_model(cfg: ModelConfig):
     if cfg.name == "seasonal_naive":
         return SeasonalNaive(cfg.season_length)
     if cfg.name == "gbm_lags":
         return GBMForecaster(cfg)
+    if cfg.name in ETS_MODELS:
+        return ETSForecaster(ETS_MODELS[cfg.name], cfg.season_length)
+    if cfg.name == "auto":
+        raise ValueError("'auto' is resolved per series by forecast.selection.select_model, not built directly")
     raise ValueError(f"unknown model {cfg.name!r}")
